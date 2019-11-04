@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"></meta>
+    <title>测试</title>
+</head>
+<body>
+<form id="form" action="/api/v1.1/load/upload/single" method="POST" enctype="multipart/form-data">
+    <input type="file" name="file"/>
+    <br/>
+    <input type="submit" value="提交"/>
+</form>
+</body>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+    console.log('0000');
+    $(document).ready(function () {
+        $('#from').submit(function () {
+            console.log('1111');
+            $(this).ajaxSubmit(function () {
+                console.log('xxxx');
+            });
+            return false;
+        });
+    });
+
+
+    function upload() {
+        // $("#form").ajaxSubmit({
+        //     type: "get",
+        //     dataType: 'json',
+        //     url: "/api/v1.1/load/upload/status",
+        //     success: function(result){
+        //         console.log(result)
+        //     }
+        // });
+        // 100ms 打印一次当前的上传进度
+        setInterval(function () {
+            $("#form").ajaxSubmit({
+                type: "get",
+                dataType: 'json',
+                url: "/api/v1.1/load/upload/status",
+                success: function(result){
+                    console.log(result)
+                }
+            });
+        }, 100);
+        return false;
+    }
+</script>
+</html>

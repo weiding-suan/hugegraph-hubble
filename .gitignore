@@ -5,6 +5,7 @@ target/
 !**/src/test/**
 **.db
 logs/
+upload-files/
 
 ### STS ###
 .apt_generated

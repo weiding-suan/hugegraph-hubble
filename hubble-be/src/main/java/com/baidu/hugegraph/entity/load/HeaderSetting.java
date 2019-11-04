@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.baidu.hugegraph.entity.query;
+package com.baidu.hugegraph.entity.load;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -30,50 +30,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GremlinResult {
+public class HeaderSetting {
 
-    @JsonProperty("type")
-    private Type type;
-
-    @JsonProperty("json_view")
-    private JsonView jsonView;
-
-    @JsonProperty("table_view")
-    private TableView tableView;
-
-    @JsonProperty("graph_view")
-    private GraphView graphView;
-
-    public enum Type {
-
-        EMPTY,
-
-        GENERAL,
-
-        VERTEX,
-
-        EDGE,
-
-        PATH;
-
-        public boolean isEmpty() {
-            return this == EMPTY;
-        }
-
-        public boolean isGeneral() {
-            return this == GENERAL;
-        }
-
-        public boolean isVertex() {
-            return this == VERTEX;
-        }
-
-        public boolean isEdge() {
-            return this == EDGE;
-        }
-
-        public boolean isGraph() {
-            return this == VERTEX || this == EDGE || this == PATH;
-        }
-    }
+    @JsonProperty("has_header")
+    private boolean hasHeader;
 }

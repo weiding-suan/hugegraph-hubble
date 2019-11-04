@@ -20,6 +20,7 @@
 package com.baidu.hugegraph.options;
 
 import static com.baidu.hugegraph.config.OptionChecker.disallowEmpty;
+import static com.baidu.hugegraph.config.OptionChecker.positiveInt;
 import static com.baidu.hugegraph.config.OptionChecker.rangeInt;
 
 import com.baidu.hugegraph.config.ConfigOption;
@@ -97,19 +98,27 @@ public class HubbleOptions extends OptionHolder {
                     500
             );
 
-    public static final ConfigOption<Integer> INDEXLABEL_CREATE_TIMEOUT =
+    public static final ConfigOption<String> UPLOAD_FILE_LOCATION =
             new ConfigOption<>(
-                    "indexlabel.create.timeout",
-                    "The timeout in seconds for waiting to create index label.",
-                    rangeInt(-1, Integer.MAX_VALUE),
-                    30
+                    "upload_file.location",
+                    "The location of uploaded files.",
+                    disallowEmpty(),
+                    "./upload-files"
             );
 
-    public static final ConfigOption<Integer> INDEXLABEL_REMOVE_TIMEOUT =
+    public static final ConfigOption<Integer> UPLOAD_FILE_SIZE_SINGLE_LIMIT =
             new ConfigOption<>(
-                    "indexlabel.remove.timeout",
-                    "The timeout in seconds for waiting to remove index label.",
-                    rangeInt(-1, Integer.MAX_VALUE),
-                    30
+                    "upload_file.size.single.limit",
+                    "The single file size(MB) limit.",
+                    positiveInt(),
+                    100
+            );
+
+    public static final ConfigOption<Integer> UPLOAD_FILE_SIZE_TOTAL_LIMIT =
+            new ConfigOption<>(
+                    "upload_file.size.total.limit",
+                    "The total file size(MB) limit.",
+                    positiveInt(),
+                    1024
             );
 }
