@@ -98,7 +98,7 @@ public class GremlinQueryService {
         return this.poolService.getOrCreate(connId);
     }
 
-    public GremlinResult executeQuery(GremlinQuery query, int connId) {
+    public GremlinResult executeQuery(int connId, GremlinQuery query) {
         HugeClient client = this.getClient(connId);
 
         String gremlin = this.optimize(query.getContent());
@@ -121,11 +121,11 @@ public class GremlinQueryService {
                             .build();
     }
 
-    public GremlinResult expandVertex(AdjacentQuery query, int connId) {
+    public GremlinResult expandVertex(int connId, AdjacentQuery query) {
         HugeClient client = this.getClient(connId);
 
         // Build gremlin query
-        String gremlin = this.buildGremlinQuery(query, connId);
+        String gremlin = this.buildGremlinQuery(connId, query);
         log.debug("expand vertex gremlin ==> {}", gremlin);
         // Execute gremlin query
         ResultSet resultSet = this.executeGremlin(gremlin, client);
@@ -334,11 +334,11 @@ public class GremlinQueryService {
         return new GraphView(vertices.values(), edges.values());
     }
 
-    private String buildGremlinQuery(AdjacentQuery query, int connId) {
+    private String buildGremlinQuery(int connId, AdjacentQuery query) {
         int degreeLimit = this.config.get(
                           HubbleOptions.GREMLIN_VERTEX_DEGREE_LIMIT);
 
-        Object id = this.getRealVertexId(query, connId);
+        Object id = this.getRealVertexId(connId, query);
         StringBuilder sb = new StringBuilder("g.V(");
         // vertex id
         sb.append(GremlinUtil.escapeId(id)).append(")");
@@ -371,7 +371,7 @@ public class GremlinQueryService {
         return sb.toString();
     }
 
-    private Object getRealVertexId(AdjacentQuery query, int connId) {
+    private Object getRealVertexId(int connId, AdjacentQuery query) {
         VertexLabelEntity entity = this.vlService.get(query.getVertexLabel(),
                                                       connId);
         IdStrategy idStrategy = entity.getIdStrategy();
