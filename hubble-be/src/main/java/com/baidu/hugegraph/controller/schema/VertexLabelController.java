@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baidu.hugegraph.common.Constant;
 import com.baidu.hugegraph.entity.schema.ConflictCheckEntity;
 import com.baidu.hugegraph.entity.schema.ConflictDetail;
 import com.baidu.hugegraph.entity.schema.LabelUpdateEntity;
@@ -56,7 +57,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.google.common.collect.ImmutableList;
 
 @RestController
-@RequestMapping("schema/vertexlabels")
+@RequestMapping(Constant.API_VERSION + "schema/vertexlabels")
 public class VertexLabelController extends SchemaController {
 
     private static final List<String> PRESET_COLORS = ImmutableList.of(
@@ -221,7 +222,7 @@ public class VertexLabelController extends SchemaController {
                                   boolean checkCreateTime) {
         String name = entity.getName();
         Ex.check(name != null, "common.param.cannot-be-null", "name");
-        Ex.check(NAME_PATTERN.matcher(name).matches(),
+        Ex.check(Constant.SCHEMA_NAME_PATTERN.matcher(name).matches(),
                  "schema.vertexlabel.unmatch-regex", name);
         Ex.check(checkCreateTime, () -> entity.getCreateTime() == null,
                  "common.param.must-be-null", "create_time");

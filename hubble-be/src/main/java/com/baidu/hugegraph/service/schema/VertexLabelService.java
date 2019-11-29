@@ -35,14 +35,15 @@ import org.springframework.util.CollectionUtils;
 
 import com.baidu.hugegraph.common.Constant;
 import com.baidu.hugegraph.driver.HugeClient;
+import com.baidu.hugegraph.entity.schema.ConflictCheckEntity;
 import com.baidu.hugegraph.entity.schema.ConflictDetail;
 import com.baidu.hugegraph.entity.schema.ConflictStatus;
 import com.baidu.hugegraph.entity.schema.LabelUpdateEntity;
-import com.baidu.hugegraph.entity.schema.ConflictCheckEntity;
 import com.baidu.hugegraph.entity.schema.Property;
 import com.baidu.hugegraph.entity.schema.PropertyIndex;
 import com.baidu.hugegraph.entity.schema.SchemaConflict;
 import com.baidu.hugegraph.entity.schema.SchemaEntity;
+import com.baidu.hugegraph.entity.schema.SchemaStyle;
 import com.baidu.hugegraph.entity.schema.SchemaType;
 import com.baidu.hugegraph.entity.schema.VertexLabelEntity;
 import com.baidu.hugegraph.exception.ExternalException;
@@ -157,8 +158,8 @@ public class VertexLabelService extends SchemaService {
             for (String name : addedIndexLabelNames) {
                 if (existedIndexLabelNames.contains(name)) {
                     throw new ExternalException(
-                            "schema.vertexlabel.update.append-index-existed",
-                            entity.getName(), name);
+                              "schema.vertexlabel.update.append-index-existed",
+                              entity.getName(), name);
                 }
             }
         }
@@ -166,8 +167,8 @@ public class VertexLabelService extends SchemaService {
             for (String name : removedIndexLabelNames) {
                 if (!existedIndexLabelNames.contains(name)) {
                     throw new ExternalException(
-                            "schema.vertexlabel.update.remove-index-unexisted",
-                            entity.getName(), name);
+                              "schema.vertexlabel.update.remove-index-unexisted",
+                              entity.getName(), name);
                 }
             }
         }
@@ -343,6 +344,8 @@ public class VertexLabelService extends SchemaService {
         if (entity == null) {
             return null;
         }
+
+        SchemaStyle style = getSchemaStyle(entity);
         return client.schema().vertexLabel(entity.getName())
                      .idStrategy(entity.getIdStrategy())
                      .properties(toStringArray(entity.getPropNames()))
@@ -350,8 +353,8 @@ public class VertexLabelService extends SchemaService {
                      .nullableKeys(toStringArray(entity.getNullableProps()))
                      .enableLabelIndex(entity.isOpenLabelIndex())
                      .userdata(USER_KEY_CREATE_TIME, entity.getCreateTime())
-                     .userdata(USER_KEY_ICON, entity.getStyle().getIcon())
-                     .userdata(USER_KEY_COLOR, entity.getStyle().getColor())
+                     .userdata(USER_KEY_ICON, style.getIcon())
+                     .userdata(USER_KEY_COLOR, style.getColor())
                      .build();
     }
 
@@ -363,11 +366,18 @@ public class VertexLabelService extends SchemaService {
                 properties.add(p.getName());
             });
         }
-        return client.schema().vertexLabel(entity.getName())
-                     .properties(toStringArray(properties))
-                     .nullableKeys(toStringArray(properties))
-                     .userdata(USER_KEY_ICON, entity.getStyle().getIcon())
-                     .userdata(USER_KEY_COLOR, entity.getStyle().getColor())
-                     .build();
+
+        VertexLabel.Builder builder;
+        builder = client.schema().vertexLabel(entity.getName())
+                        .properties(toStringArray(properties))
+                        .nullableKeys(toStringArray(properties));
+        SchemaStyle style = entity.getStyle();
+        if (style.getIcon() != null) {
+            builder.userdata(USER_KEY_ICON, style.getIcon());
+        }
+        if (style.getColor() != null) {
+            builder.userdata(USER_KEY_COLOR, style.getColor());
+        }
+        return builder.build();
     }
 }
