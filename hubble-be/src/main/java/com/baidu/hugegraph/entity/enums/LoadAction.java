@@ -17,31 +17,29 @@
  * under the License.
  */
 
-package com.baidu.hugegraph.entity.load;
+package com.baidu.hugegraph.entity.enums;
 
-import java.util.List;
+import com.baomidou.mybatisplus.core.enums.IEnum;
 
-import com.baidu.hugegraph.annotation.MergeProperty;
-import com.fasterxml.jackson.annotation.JsonProperty;
+public enum LoadAction implements IEnum<Byte> {
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+    START(0),
 
-@EqualsAndHashCode(callSuper = true)
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class EdgeMapping extends ElementMapping {
+    PAUSE(1),
 
-    @MergeProperty
-    @JsonProperty("source")
-    private List<String> sourceFields;
+    CONTINUE(2),
 
-    @MergeProperty
-    @JsonProperty("target")
-    private List<String> targetFields;
+    TERMINATE(3);
+
+    private byte code;
+
+    LoadAction(int code) {
+        assert code < 256;
+        this.code = (byte) code;
+    }
+
+    @Override
+    public Byte getValue() {
+        return this.code;
+    }
 }

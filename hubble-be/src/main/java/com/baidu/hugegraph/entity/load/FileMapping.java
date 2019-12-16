@@ -21,6 +21,7 @@ package com.baidu.hugegraph.entity.load;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.baidu.hugegraph.annotation.MergeProperty;
@@ -68,6 +69,10 @@ public class FileMapping {
     @TableField("has_header")
     @JsonProperty("has_header")
     private boolean hasHeader;
+
+    @TableField("header")
+    @JsonProperty("header")
+    private List<String> header;
 
     @TableField(value = "advanced_setting",
                 typeHandler = JacksonTypeHandler.class)

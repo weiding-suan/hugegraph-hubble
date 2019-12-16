@@ -19,6 +19,8 @@
 
 package com.baidu.hugegraph.entity.load;
 
+import com.baidu.hugegraph.annotation.MergeProperty;
+import com.baidu.hugegraph.common.Mergeable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -30,23 +32,29 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LoadParameter {
+public class LoadParameter implements Mergeable {
 
+    @MergeProperty
     @JsonProperty("check_vertex")
     private boolean checkVertex = false;
 
+    @MergeProperty
     @JsonProperty("insert_timeout")
     private int insertTimeout = 60;
 
+    @MergeProperty
     @JsonProperty("max_parse_errors")
     private int maxParseErrors = 1;
 
+    @MergeProperty
     @JsonProperty("max_insert_errors")
     private int maxInsertErrors = 500;
 
+    @MergeProperty
     @JsonProperty("retry_times")
     private int retryTimes = 0;
 
+    @MergeProperty
     @JsonProperty("retry_interval")
     private int retryInterval = 10;
 }

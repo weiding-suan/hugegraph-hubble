@@ -59,7 +59,7 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RestController
 @RequestMapping(Constant.API_VERSION + "graph-connections/{connId}/upload-file")
-public class FileUploadController {
+public class FilePoolController {
 
     @Autowired
     private HugeConfig config;

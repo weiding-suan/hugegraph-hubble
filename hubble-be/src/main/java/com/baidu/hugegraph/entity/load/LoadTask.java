@@ -19,11 +19,17 @@
 
 package com.baidu.hugegraph.entity.load;
 
+import java.util.Date;
+
 import com.baidu.hugegraph.annotation.MergeProperty;
+import com.baidu.hugegraph.entity.enums.LoadStatus;
+import com.baidu.hugegraph.util.SerializeUtil;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -42,5 +48,39 @@ public class LoadTask {
     @JsonProperty("id")
     private Integer id;
 
+    @TableField(value = "conn_id")
+    @MergeProperty
+    @JsonProperty("conn_id")
+    private Integer connId;
 
+    @TableField("name")
+    @MergeProperty
+    @JsonProperty("name")
+    private String name;
+
+    @TableField("remark")
+    @MergeProperty
+    @JsonProperty("remark")
+    private String remark;
+
+    @TableField("total_file_size")
+    @MergeProperty
+    @JsonProperty("total_file_size")
+    private Long totalFileSize;
+
+    @TableField(value = "load_status")
+    @MergeProperty
+    @JsonProperty("status")
+    private LoadStatus status;
+
+    @TableField(value = "duration")
+    @MergeProperty
+    @JsonProperty("duration")
+    @JsonSerialize(using = SerializeUtil.DurationSerializer.class)
+    private Long duration;
+
+    @TableField(value = "create_time")
+    @MergeProperty(useNew = false)
+    @JsonProperty("create_time")
+    private Date createTime;
 }

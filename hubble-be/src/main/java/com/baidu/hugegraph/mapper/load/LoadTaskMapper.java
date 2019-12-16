@@ -17,31 +17,15 @@
  * under the License.
  */
 
-package com.baidu.hugegraph.entity.load;
+package com.baidu.hugegraph.mapper.load;
 
-import java.util.List;
+import org.apache.ibatis.annotations.Mapper;
+import org.springframework.stereotype.Component;
 
-import com.baidu.hugegraph.annotation.MergeProperty;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.baidu.hugegraph.entity.load.LoadTask;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-@EqualsAndHashCode(callSuper = true)
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class EdgeMapping extends ElementMapping {
-
-    @MergeProperty
-    @JsonProperty("source")
-    private List<String> sourceFields;
-
-    @MergeProperty
-    @JsonProperty("target")
-    private List<String> targetFields;
+@Mapper
+@Component
+public interface LoadTaskMapper extends BaseMapper<LoadTask> {
 }

@@ -66,4 +66,9 @@ public class FileMappingService {
     public int update(FileMapping mapping) {
         return this.mapper.updateById(mapping);
     }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public int remove(int id) {
+        return this.mapper.deleteById(id);
+    }
 }

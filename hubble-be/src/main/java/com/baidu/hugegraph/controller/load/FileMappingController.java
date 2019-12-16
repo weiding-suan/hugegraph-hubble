@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,6 +44,7 @@ import com.baidu.hugegraph.entity.load.EdgeMapping;
 import com.baidu.hugegraph.entity.load.FileMapping;
 import com.baidu.hugegraph.entity.load.FileSummary;
 import com.baidu.hugegraph.entity.load.HeaderSetting;
+import com.baidu.hugegraph.entity.load.LoadParameter;
 import com.baidu.hugegraph.entity.load.VertexMapping;
 import com.baidu.hugegraph.exception.ExternalException;
 import com.baidu.hugegraph.exception.InternalException;
@@ -56,14 +56,14 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RestController
 @RequestMapping(Constant.API_VERSION + "graph-connections/{connId}/load")
-public class LoadDataController extends BaseController {
+public class FileMappingController extends BaseController {
 
     @Autowired
-    private FileMappingService fileMappingService;
+    private FileMappingService service;
 
     @GetMapping("file-summaries/{id}")
     public FileSummary getSummary(@PathVariable("id") int id) {
-        FileMapping mapping = this.fileMappingService.get(id);
+        FileMapping mapping = this.service.get(id);
         if (mapping == null) {
             throw new ExternalException("load.file-mapping.not-exist.id", id);
         }
@@ -117,19 +117,32 @@ public class LoadDataController extends BaseController {
                                                  required = false,
                                                  defaultValue = "10")
                                    int pageSize) {
-        return this.fileMappingService.list(connId, pageNo, pageSize);
+        return this.service.list(connId, pageNo, pageSize);
+    }
+
+    @DeleteMapping("file-mappings/{id}")
+    public void delete(@PathVariable("id") int id) {
+        FileMapping mapping = this.service.get(id);
+        if (mapping == null) {
+            throw new ExternalException("load.file-mapping.not-exist.id", id);
+        }
+
+        int rows = this.service.remove(id);
+        if (rows != 1) {
+            throw new InternalException("entity.delete.failed", mapping);
+        }
     }
 
     @PostMapping("file-mappings/{id}/header-setting")
     public void headerSetting(@PathVariable("id") int id,
                               @RequestBody HeaderSetting newEntity) {
-        FileMapping mapping = this.fileMappingService.get(id);
+        FileMapping mapping = this.service.get(id);
         if (mapping == null) {
             throw new ExternalException("load.file-mapping.not-exist.id", id);
         }
 
         mapping.setHasHeader(newEntity.isHasHeader());
-        int rows = this.fileMappingService.update(mapping);
+        int rows = this.service.update(mapping);
         if (rows != 1) {
             throw new InternalException("entity.update.failed", mapping);
         }
@@ -138,7 +151,7 @@ public class LoadDataController extends BaseController {
     @PostMapping("file-mappings/{id}/advanced-setting")
     public void advancedSetting(@PathVariable("id") int id,
                                 @RequestBody AdvancedSetting newEntity) {
-        FileMapping mapping = this.fileMappingService.get(id);
+        FileMapping mapping = this.service.get(id);
         if (mapping == null) {
             throw new ExternalException("load.file-mapping.not-exist.id", id);
         }
@@ -146,7 +159,7 @@ public class LoadDataController extends BaseController {
         AdvancedSetting oldEntity = mapping.getAdvancedSetting();
         AdvancedSetting entity = this.mergeEntity(oldEntity, newEntity);
         mapping.setAdvancedSetting(entity);
-        int rows = this.fileMappingService.update(mapping);
+        int rows = this.service.update(mapping);
         if (rows != 1) {
             throw new InternalException("entity.update.failed", mapping);
         }
@@ -155,33 +168,13 @@ public class LoadDataController extends BaseController {
     @PostMapping("file-mappings/{id}/vertex-mappings")
     public void addVertexMapping(@PathVariable("id") int id,
                                  @RequestBody VertexMapping newEntity) {
-        FileMapping mapping = this.fileMappingService.get(id);
+        FileMapping mapping = this.service.get(id);
         if (mapping == null) {
             throw new ExternalException("load.file-mapping.not-exist.id", id);
         }
 
         mapping.getVertexMappings().put(newEntity.getLabel(), newEntity);
-        int rows = this.fileMappingService.update(mapping);
-        if (rows != 1) {
-            throw new InternalException("entity.update.failed", mapping);
-        }
-    }
-
-    // TODO: 到底是否需要更新这个API，还是说直接post就行
-    //  check label and newEntity.label equals
-    @PutMapping("file-mappings/{id}/vertex-mappings/{label}")
-    public void updateVertexMapping(@PathVariable("id") int id,
-                                    @PathVariable("label") String label,
-                                    @RequestBody VertexMapping newEntity) {
-        FileMapping mapping = this.fileMappingService.get(id);
-        if (mapping == null) {
-            throw new ExternalException("load.file-mapping.not-exist.id", id);
-        }
-
-        VertexMapping oldEntity = mapping.getVertexMappings().get(label);
-        VertexMapping entity = this.mergeEntity(oldEntity, newEntity);
-        mapping.getVertexMappings().put(label, entity);
-        int rows = this.fileMappingService.update(mapping);
+        int rows = this.service.update(mapping);
         if (rows != 1) {
             throw new InternalException("entity.update.failed", mapping);
         }
@@ -190,7 +183,7 @@ public class LoadDataController extends BaseController {
     @DeleteMapping("file-mappings/{id}/vertex-mappings/{label}")
     public void deleteVertexMapping(@PathVariable("id") int id,
                                     @PathVariable("label") String label) {
-        FileMapping mapping = this.fileMappingService.get(id);
+        FileMapping mapping = this.service.get(id);
         if (mapping == null) {
             throw new ExternalException("load.file-mapping.not-exist.id", id);
         }
@@ -200,7 +193,7 @@ public class LoadDataController extends BaseController {
             throw new ExternalException(
                       "load.file-mapping.vertex-mapping.not-exist.label", label);
         }
-        int rows = this.fileMappingService.update(mapping);
+        int rows = this.service.update(mapping);
         if (rows != 1) {
             throw new InternalException("entity.update.failed", mapping);
         }
@@ -209,32 +202,13 @@ public class LoadDataController extends BaseController {
     @PostMapping("file-mappings/{id}/edge-mappings")
     public void addEdgeMapping(@PathVariable("id") int id,
                                @RequestBody EdgeMapping newEntity) {
-        FileMapping mapping = this.fileMappingService.get(id);
+        FileMapping mapping = this.service.get(id);
         if (mapping == null) {
             throw new ExternalException("load.file-mapping.not-exist.id", id);
         }
 
         mapping.getEdgeMappings().put(newEntity.getLabel(), newEntity);
-        int rows = this.fileMappingService.update(mapping);
-        if (rows != 1) {
-            throw new InternalException("entity.update.failed", mapping);
-        }
-    }
-
-    @PutMapping("file-mappings/{id}/edge-mappings/{label}")
-    public void updateEdgeMapping(@PathVariable("id") int id,
-                                  @PathVariable("label") String label,
-                                  @RequestBody EdgeMapping newEntity) {
-        FileMapping mapping = this.fileMappingService.get(id);
-        if (mapping == null) {
-            throw new ExternalException("load.file-mapping.not-exist.id", id);
-        }
-
-        // TODO: check label and newEntity.label equals
-        EdgeMapping oldEntity = mapping.getEdgeMappings().get(label);
-        EdgeMapping entity = this.mergeEntity(oldEntity, newEntity);
-        mapping.getEdgeMappings().put(label, entity);
-        int rows = this.fileMappingService.update(mapping);
+        int rows = this.service.update(mapping);
         if (rows != 1) {
             throw new InternalException("entity.update.failed", mapping);
         }
@@ -243,7 +217,7 @@ public class LoadDataController extends BaseController {
     @DeleteMapping("file-mappings/{id}/edge-mappings/{label}")
     public void deleteEdgeMapping(@PathVariable("id") int id,
                                   @PathVariable("label") String label) {
-        FileMapping mapping = this.fileMappingService.get(id);
+        FileMapping mapping = this.service.get(id);
         if (mapping == null) {
             throw new ExternalException("load.file-mapping.not-exist.id", id);
         }
@@ -253,7 +227,24 @@ public class LoadDataController extends BaseController {
             throw new ExternalException(
                       "load.file-mapping.edge-mapping.not-exist.label", label);
         }
-        int rows = this.fileMappingService.update(mapping);
+        int rows = this.service.update(mapping);
+        if (rows != 1) {
+            throw new InternalException("entity.update.failed", mapping);
+        }
+    }
+
+    @PostMapping("file-mappings/{id}/load-parameter")
+    public void loadParameter(@PathVariable("id") int id,
+                              @RequestBody LoadParameter newEntity) {
+        FileMapping mapping = this.service.get(id);
+        if (mapping == null) {
+            throw new ExternalException("load.file-mapping.not-exist.id", id);
+        }
+
+        LoadParameter oldEntity = mapping.getLoadParameter();
+        LoadParameter entity = this.mergeEntity(oldEntity, newEntity);
+        mapping.setLoadParameter(entity);
+        int rows = this.service.update(mapping);
         if (rows != 1) {
             throw new InternalException("entity.update.failed", mapping);
         }

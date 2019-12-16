@@ -36,6 +36,10 @@ import lombok.NoArgsConstructor;
 public class AdvancedSetting implements Mergeable {
 
     @MergeProperty
+    @JsonProperty("format")
+    private String format = "CSV";
+
+    @MergeProperty
     @JsonProperty("delimiter")
     private String delimiter = ",";
 
